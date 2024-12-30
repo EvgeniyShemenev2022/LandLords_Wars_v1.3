@@ -145,7 +145,7 @@ func change_turn():
 	self.CHANGE_TURN.emit()
 
 # создаем юнита
-func hire_unit(name, type, base_turn, attack, heath, defence):
+func hire_unit(name, type, base_turn, power, heath, defence):
 	if can_i_hire_this_unit(what_type_of_unit(type)) != false:
 		var warrior_new = warrior.instantiate()
 		warrior_new.name = name + str(numb_of_unit)
@@ -159,7 +159,7 @@ func hire_unit(name, type, base_turn, attack, heath, defence):
 		# присваиваем статы нашему юниту (не знаю как записать в одну строку)
 		warrior_new.stats["type"] = type
 		warrior_new.stats["base_turn"] = base_turn
-		warrior_new.stats["attack"] = attack
+		warrior_new.stats["power"] = power
 		warrior_new.stats["heath"] = heath
 		warrior_new.stats["defence"] = defence
 		warrior_new.stats["status"] = "on moving"
@@ -182,7 +182,28 @@ func can_i_hire_this_unit(COST : Dictionary):
 	if COST["gold"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["gold"] or COST["production"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["production"] or COST["food"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["food"]:
 		return false
 
+# дабавить в парамерты тип местности и бонусы от флангов
 func FIGHT(attack_node, defence_node):
-	defence_node.stats["heath"] -= attack_node.stats["attack"]
-	var damage = attack_node.stats["attack"]
+	var ratio :float
+	var ratio_2 :float = 0
+	var base_damage = 30
+	var damage
+	var def_health = (100 - defence_node.stats["heath"]) * 0.5
+	var att_health = (100 - attack_node.stats["heath"]) * 0.5
+	var defence_bonus
+	var bonus_first = 0.20
+	if defence_node.stats["status"] == "defence":
+		defence_bonus = 0.25
+	else:
+		defence_bonus = 0
+	ratio = (attack_node.stats["power"] * (1 + bonus_first)) / (defence_node.stats["power"] * (1 + defence_bonus))
+	print("RATIO:  ", ratio)
+	if ratio > 1:
+		ratio_2 = abs(1.0 - ratio)
+	
+	print("ratio_2:  ", ratio_2)
+	damage = (base_damage + (base_damage * ratio_2) - att_health)
+	
+	defence_node.stats["heath"] -= damage
+	print("DAMAGE:  ", damage)
 	self.UNIT_STRIKES.emit(SELECTED_NODE, COLLIDING_NODE, damage) # посылаем сигнал в ноду атакуемого юнита

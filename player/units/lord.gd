@@ -24,8 +24,8 @@ var is_in_defence = false
 
 var stats = {"type" : "lord",
 			"base_turn" : 2,
-			"attack" : 2,
-			"heath" : 10,
+			"power" : 10,
+			"heath" : 100,
 			"defence" : 5,
 			"status" : "on_moving"} # "on_moving", "defence"
 
