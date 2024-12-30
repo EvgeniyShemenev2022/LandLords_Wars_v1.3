@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://bdvxdrlvfftsy"]
+
+[ext_resource type="Texture2D" uid="uid://bkyfjsi1qnegc" path="res://tilesets/TilesetGrass/overworld_tileset_grass.png" id="1_2or0r"]
+[ext_resource type="Script" path="res://player/buildings/production.gd" id="2_rfxju"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f50w1"]
+atlas = ExtResource("1_2or0r")
+region = Rect2(15.7683, 287.346, 16.4742, 17.4554)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hrunt"]
+size = Vector2(16, 17)
+
+[node name="Production" type="Sprite2D"]
+position = Vector2(0, -6.8896e-07)
+scale = Vector2(1, 0.941176)
+texture = SubResource("AtlasTexture_f50w1")
+script = ExtResource("2_rfxju")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2(0, 9.22009e-07)
+shape = SubResource("RectangleShape2D_hrunt")

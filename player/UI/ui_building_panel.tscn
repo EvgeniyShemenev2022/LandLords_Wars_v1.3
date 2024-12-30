@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3 uid="uid://6y0trcl6sk1i"]
+
+[ext_resource type="Texture2D" uid="uid://ccsf84ibl21a6" path="res://tilesets/Tiny Swords (Update 010)/Factions/Knights/Buildings/Tower/Tower_Blue.png" id="1_5jici"]
+[ext_resource type="Script" path="res://player/UI/ui_building_panel.gd" id="1_6qspm"]
+
+[node name="UI_building_panel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6qspm")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+offset_left = 128.0
+offset_top = 64.0
+offset_right = 448.0
+offset_bottom = 256.0
+
+[node name="Label" type="Label" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 16.0
+offset_right = 256.0
+offset_bottom = 39.0
+text = "Build a Tower? "
+horizontal_alignment = 1
+
+[node name="Yes" type="Button" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 136.0
+offset_right = 128.0
+offset_bottom = 160.0
+text = "YES"
+
+[node name="No" type="Button" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 192.0
+offset_top = 136.0
+offset_right = 256.0
+offset_bottom = 160.0
+text = "NO"
+
+[node name="Icon_tower" type="Sprite2D" parent="CanvasLayer/Panel"]
+position = Vector2(160, 84)
+scale = Vector2(0.5, 0.34375)
+texture = ExtResource("1_5jici")
+
+[connection signal="pressed" from="CanvasLayer/Panel/Yes" to="." method="_on_yes_pressed"]
+[connection signal="pressed" from="CanvasLayer/Panel/No" to="." method="_on_no_pressed"]

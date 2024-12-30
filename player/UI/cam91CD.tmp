@@ -1,0 +1,26 @@
+[gd_scene load_steps=4 format=3 uid="uid://byuvp2ixk1xq2"]
+
+[ext_resource type="Script" path="res://player/UI/label.gd" id="1_1jdqb"]
+[ext_resource type="Script" path="res://player/UI/camera_2d.gd" id="1_8b4om"]
+[ext_resource type="Script" path="res://player/UI/turn.gd" id="3_d8de6"]
+
+[node name="Camera2D" type="Camera2D"]
+zoom = Vector2(2, 2)
+script = ExtResource("1_8b4om")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -40.0
+offset_top = -80.0
+offset_right = 40.0
+offset_bottom = -57.0
+script = ExtResource("1_1jdqb")
+
+[node name="TURN" type="Button" parent="."]
+offset_left = -136.0
+offset_top = 40.0
+offset_right = -84.0
+offset_bottom = 71.0
+text = "TURN"
+script = ExtResource("3_d8de6")
+
+[connection signal="pressed" from="TURN" to="TURN" method="_on_pressed"]

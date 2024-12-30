@@ -1,0 +1,85 @@
+[gd_scene load_steps=5 format=3 uid="uid://bgipfgh0lwvx0"]
+
+[ext_resource type="Texture2D" uid="uid://3ix6jngs0h3r" path="res://tilesets/free_fantasy_rpg_icons/spear.png" id="1_8oi7q"]
+[ext_resource type="Script" path="res://player/UI/ui_hire_panel.gd" id="1_a12ar"]
+[ext_resource type="Texture2D" uid="uid://cc868m6pe3nmx" path="res://tilesets/free_fantasy_rpg_icons/horseshoer.png" id="2_sv5db"]
+[ext_resource type="Texture2D" uid="uid://dsnyb73q23bgy" path="res://tilesets/free_fantasy_rpg_icons/archery1.png" id="3_pvfre"]
+
+[node name="UI_hire_panel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_a12ar")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+offset_left = 128.0
+offset_top = 64.0
+offset_right = 448.0
+offset_bottom = 256.0
+
+[node name="Label" type="Label" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 16.0
+offset_right = 256.0
+offset_bottom = 39.0
+text = "HIRE SOLDIERS?"
+horizontal_alignment = 1
+
+[node name="Spire" type="Button" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 136.0
+offset_right = 104.0
+offset_bottom = 167.0
+text = "SPIRE"
+
+[node name="Knight" type="Button" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 136.0
+offset_right = 200.0
+offset_bottom = 167.0
+text = "KNIGHT"
+
+[node name="Archer" type="Button" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 216.0
+offset_top = 136.0
+offset_right = 296.0
+offset_bottom = 168.0
+text = "ARCHER"
+
+[node name="Not-yet" type="Button" parent="CanvasLayer/Panel"]
+layout_mode = 0
+offset_left = 256.0
+offset_top = 16.0
+offset_right = 312.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 10
+text = "Not yet"
+
+[node name="Spear" type="Sprite2D" parent="CanvasLayer/Panel"]
+position = Vector2(64, 96)
+scale = Vector2(2, 2)
+texture = ExtResource("1_8oi7q")
+
+[node name="Horseshoer" type="Sprite2D" parent="CanvasLayer/Panel"]
+position = Vector2(160, 96)
+scale = Vector2(2, 2)
+texture = ExtResource("2_sv5db")
+
+[node name="Archery1" type="Sprite2D" parent="CanvasLayer/Panel"]
+position = Vector2(256, 96)
+scale = Vector2(2, 2)
+texture = ExtResource("3_pvfre")
+
+[connection signal="pressed" from="CanvasLayer/Panel/Spire" to="." method="_on_spire_pressed"]
+[connection signal="pressed" from="CanvasLayer/Panel/Knight" to="." method="_on_knight_pressed"]
+[connection signal="pressed" from="CanvasLayer/Panel/Archer" to="." method="_on_archer_pressed"]
+[connection signal="pressed" from="CanvasLayer/Panel/Not-yet" to="." method="_on_notyet_pressed"]

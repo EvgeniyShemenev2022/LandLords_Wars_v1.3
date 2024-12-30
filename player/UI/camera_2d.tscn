@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://byuvp2ixk1xq2"]
+
+[ext_resource type="Script" path="res://player/UI/camera_2d.gd" id="1_8b4om"]
+
+[node name="Camera2D" type="Camera2D"]
+zoom = Vector2(1.5, 1.5)
+script = ExtResource("1_8b4om")
