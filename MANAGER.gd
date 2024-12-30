@@ -61,6 +61,7 @@ func buld_a_ferma():
 			GLOBAL.WHOSE_RESOURSE_TO_TAKE()["gold"] -= COST_FERMA["gold"]
 			GLOBAL.WHOSE_RESOURSE_TO_TAKE()["production"] -= COST_FERMA["production"]
 			GLOBAL.update_label_value.emit()
+			print("ФЕРМА ПОСТРОЕНА")
 
 # строим производство
 func buld_a_production():
