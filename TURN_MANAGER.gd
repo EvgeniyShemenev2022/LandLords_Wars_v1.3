@@ -3,7 +3,7 @@ extends Node
 signal SELECTED_NODE_END_TURN(SELECTED_NODE : Node2D)
 signal CHANGE_CAM_POSITION(units_col : Array)
 signal CHANGE_TURN
-signal UNIT_STRIKES(attack_node : Node2D, defence_node : Node2D, damage : int) # если юнит атакует - посылаем сигнал в его узел
+signal UNIT_STRIKES(attack_node : Node2D, defence_node : Node2D, damage : int, dam_for_att_full : int) # если юнит атакует - посылаем сигнал в его узел
 var CURRENT_TURN : int = 1
 var WHO_ARE_TURNED_NOW :int = 0 # индекс в массиве
 const CURRENT_PLYER = ["Player_1", "Player_2"]
@@ -182,7 +182,7 @@ func can_i_hire_this_unit(COST : Dictionary):
 	if COST["gold"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["gold"] or COST["production"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["production"] or COST["food"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["food"]:
 		return false
 
-# дабавить в парамерты тип местности и бонусы от флангов
+# добавить в парамерты тип местности и бонусы от флангов
 func FIGHT(attack_node, defence_node):
 	var ratio :float
 	var ratio_2 :float = 0
@@ -192,18 +192,37 @@ func FIGHT(attack_node, defence_node):
 	var att_health = (100 - attack_node.stats["heath"]) * 0.5
 	var defence_bonus
 	var bonus_first = 0.20
+	var dam_for_att
+	
 	if defence_node.stats["status"] == "defence":
 		defence_bonus = 0.25
 	else:
 		defence_bonus = 0
+	
+
+	
 	ratio = (attack_node.stats["power"] * (1 + bonus_first)) / (defence_node.stats["power"] * (1 + defence_bonus))
 	print("RATIO:  ", ratio)
 	if ratio > 1:
 		ratio_2 = abs(1.0 - ratio)
+	# коэффициент урона, чем слабее другой юнит, тем меньше урона наносишь себе
+	if int(ratio*10) in range(10, 12):
+		dam_for_att = 0.6
+	elif int(ratio*10) in range(12, 13):
+		dam_for_att = 0.5
+	elif ratio*10 in range(13, 15):
+		dam_for_att = 0.3
+	elif ratio*10 in range(15, 16):
+		dam_for_att = 0.2
+	elif ratio*10 in range(16, 19):
+		dam_for_att = 0.15
 	
 	print("ratio_2:  ", ratio_2)
-	damage = (base_damage + (base_damage * ratio_2) - att_health)
+	# базовый + отношение сил - неполное_здоровье_нападающего + неполное здоровье обороняющегося (чем он слабее тем сильнее урон)
+	damage = (base_damage + (base_damage * ratio_2) - att_health + def_health)
 	
 	defence_node.stats["heath"] -= damage
+	var dam_for_att_full :int = int(damage * dam_for_att)
+	attack_node.stats["heath"] -= dam_for_att_full
 	print("DAMAGE:  ", damage)
-	self.UNIT_STRIKES.emit(SELECTED_NODE, COLLIDING_NODE, damage) # посылаем сигнал в ноду атакуемого юнита
+	self.UNIT_STRIKES.emit(SELECTED_NODE, COLLIDING_NODE, damage, dam_for_att_full) # посылаем сигнал в ноду атакуемого юнита
