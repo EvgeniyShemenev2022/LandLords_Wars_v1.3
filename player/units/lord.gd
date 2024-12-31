@@ -112,9 +112,14 @@ func _on_area_2d_mouse_exited() -> void:
 	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 	#print("OUT")
 
-func unit_was_attacked(attack_node, defence_node, damage):
+func unit_was_attacked(attack_node, defence_node, damage, dam_for_att):
 	if self == defence_node:
 		progress_bar.visible = true
 		progress_bar.value -= damage
+		if stats["heath"] <= 0:
+			queue_free()
+	if self == attack_node:
+		progress_bar.visible = true
+		progress_bar.value -= dam_for_att
 		if stats["heath"] <= 0:
 			queue_free()
