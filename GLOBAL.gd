@@ -21,6 +21,14 @@ var GOLD_PER_TURN  = [0, 1, 1]
 var PROD_PER_TURN  = [0, 2, 2]
 var FOOD_PER_TURN  = [0, 1, 1]
 
+#func _physics_process(delta: float) -> void:
+	#if TURN_MANAGER.CURRENT_TURN > 1:
+		#if TURN_MANAGER.SELECTED_NODE.stats["type"] == "archer" and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			#DisplayServer.mouse_get_position()
+			#select_enemy_for_shot(DisplayServer.mouse_get_position())
+
+
+
 func WHOSE_RESOURSE_TO_TAKE():
 	if TURN_MANAGER.NUMB_OF_PLAYER_WHO_TUNED == 1:
 		return RESOURCE_PL_1
@@ -38,3 +46,9 @@ func CAPITAL_PRODUCT_EVERY_TURN():
 		GLOBAL.RESOURCE_PL_2["food"] += food_value_city
 		GLOBAL.RESOURCE_PL_2["production"] += prod_value_city
 	GLOBAL.update_label_value.emit()
+
+
+
+#func select_enemy_for_shot(coord : Vector2):
+	#print("Выстрел, пиф-паф")
+	#print (coord)

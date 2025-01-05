@@ -21,7 +21,6 @@ var is_moving = false
 var mouse_on_unit = false
 var is_selected = false
 var is_in_defence = false
-var archer_can_shooting = false
 
 var stats = {"type" : "lord",
 			"base_turn" : 2,
@@ -47,32 +46,28 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	#print("TURN_MANAGER.ARCHER_IS_SELECTED: ", TURN_MANAGER.ARCHER_IS_SELECTED)
 	# возможно это нужно перенести в обычную функцию
-	if TURN_MANAGER.units_col.has(self) == false: #and TURN_MANAGER.ARCHER_IS_SELECTED == false:
+	if TURN_MANAGER.units_col.has(self) == false:
 		color_rect.visible = true
 		#return
 	else:
 		color_rect.visible = false
-		if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == true and  mouse_on_unit == true and event.is_action_released("left_click"):
-			is_selected = true
-			#TURN_MANAGER.UNIT_CANT_MOVE = false
-			animation_player.play("selected")
-			TURN_MANAGER.SELECTED_UNIT_POSITION = global_position # передаем в менеджер позицию объекта
-			TURN_MANAGER.SELECTED_NODE = self as Node2D
-			TURN_MANAGER.RAY_CAST_2D = ray_cast_2d # передаем детектор текущего персонажа
-			print(stats)
-			TURN_MANAGER.default_move = stats["base_turn"] # передаем базовые ходы текущего юнита
-			TURN_MANAGER.IS_UNIT_IN_DEFENCE = is_in_defence # если юнит в обороне, он не должен ходить
-			print("Ходы: ", TURN_MANAGER.default_move)
-			if self.stats["type"] == "archer": #даем возможность лучнику щелкать по цели, передавая инфу в FIGHT()
-				TURN_MANAGER.ARCHER_IS_SELECTED = true
-				print("archer_is_selected: ", TURN_MANAGER.ARCHER_IS_SELECTED)
-		elif self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == true and mouse_on_unit == false and is_selected == true and event.is_action_released("left_click") and archer_can_shooting == false:
-				is_selected = false
-				TURN_MANAGER.ARCHER_IS_SELECTED = false
-				animation_player.stop()
-				#TURN_MANAGER.UNIT_CANT_MOVE = true
+		if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == true :
+			if mouse_on_unit == true and event.is_action_pressed("left_click"):
+					is_selected = true
+					animation_player.play("selected")
+					TURN_MANAGER.SELECTED_UNIT_POSITION = global_position # передаем в менеджер позицию объекта
+					TURN_MANAGER.SELECTED_NODE = self as Node2D
+					TURN_MANAGER.RAY_CAST_2D = ray_cast_2d # передаем детектор текущего персонажа
+					print(stats)
+					TURN_MANAGER.default_move = stats["base_turn"] # передаем базовые ходы текущего юнита
+					TURN_MANAGER.IS_UNIT_IN_DEFENCE = is_in_defence # если юнит в обороне, он не должен ходить
+					print(TURN_MANAGER.default_move)
+						
+					
+			elif mouse_on_unit == false and event.is_action_pressed("left_click"):
+					is_selected = false
+					animation_player.stop()
 	
 	# вызываем панель строительства зданий
 	if mouse_on_unit == true and event.is_action_pressed("right_click") and is_selected == true and self.name == "Lord":
@@ -100,11 +95,6 @@ func _input(event: InputEvent) -> void:
 			animation_player.play("selected")
 			is_in_defence = false
 			TURN_MANAGER.IS_UNIT_IN_DEFENCE = is_in_defence # если юнит в обороне, он не должен ходить
-	# условие для лучника
-	if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == false:
-		if mouse_on_unit == true and TURN_MANAGER.ARCHER_IS_SELECTED == true and event.is_action_released("left_click"):
-			print("МОЖНО КЛИКАТЬ И СТРЕлЯТЬ")
-
 
 # ПО СИГНАЛУ выключаем анимацию и ставим блок на выбор
 func is_unit_finished_his_turn(SELECTED_NODE):
@@ -115,13 +105,14 @@ func is_unit_finished_his_turn(SELECTED_NODE):
 # сигналы, для селекта конкретного юнита
 func _on_area_2d_mouse_entered() -> void:
 	mouse_on_unit = true
-	#print("mouse_on_unit  ", mouse_on_unit)
 	#Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND)
+	#if TURN_MANAGER.CURRENT_TURN > 1:
+		#if TURN_MANAGER.SELECTED_NODE.stats["type"] == "archer" and self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == false:
+			#Input.set_default_cursor_shape(Input.CURSOR_MOVE)
 	print("IN")
 
 func _on_area_2d_mouse_exited() -> void:
 	mouse_on_unit = false
-	#print("mouse_on_unit  ", mouse_on_unit)
 	#Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 	print("OUT")
 
@@ -147,17 +138,5 @@ func unit_was_attacked(attack_node, defence_node, damage, dam_for_att_full, atta
 	#get_global_mouse_position()
 
 
-
-func _on_archer_shot_area_mouse_entered() -> void:
-	prints("Юнит: ", self,  self.get_groups() )
-	if TURN_MANAGER.ARCHER_IS_SELECTED == true:
-		print("ARCHER_IS_SELECTED == true")
-		if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == false:
-			archer_can_shooting = true
-			print("archer_can_shooting - ",archer_can_shooting )
-
-func _on_archer_shot_area_mouse_exited() -> void:
-	if TURN_MANAGER.ARCHER_IS_SELECTED == true:
-		if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == false:
-			archer_can_shooting = false
-			print("archer_can_shooting - ",archer_can_shooting )
+func _on_archer_area_mouse_entered() -> void:
+	pass # Replace with function body.

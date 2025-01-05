@@ -3,7 +3,7 @@ extends Node
 signal SELECTED_NODE_END_TURN(SELECTED_NODE : Node2D)
 signal CHANGE_CAM_POSITION(units_col : Array)
 signal CHANGE_TURN
-signal UNIT_STRIKES(attack_node : Node2D, defence_node : Node2D, damage : int, dam_for_att_full : int) # если юнит атакует - посылаем сигнал в его узел
+signal UNIT_STRIKES(attack_node : Node2D, defence_node : Node2D, damage : int, dam_for_att_full : int, is_attacker_stronger : bool) # если юнит атакует - посылаем сигнал в его узел
 var CURRENT_TURN : int = 1
 var WHO_ARE_TURNED_NOW :int = 0 # индекс в массиве
 const CURRENT_PLYER = ["Player_1", "Player_2"]
@@ -14,6 +14,8 @@ var UNIT_TYPE :int = 3 # соответствует номеру в массив
 var numb_of_unit :int = 1
 @onready var warrior = preload("res://player/units/lord.tscn")
 var IS_UNIT_IN_DEFENCE = false
+var UNIT_CANT_MOVE = false #костыль, используется когда выбрали юнита, а затем сняли выбор мышкой
+var ARCHER_IS_SELECTED = false
 
 var default_move : int = 2
 var current_move : int = 1
@@ -39,7 +41,7 @@ func _ready() -> void:
 	pass
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if units_col.has(SELECTED_NODE) == true and IS_UNIT_IN_DEFENCE == false:
+	if units_col.has(SELECTED_NODE) == true and IS_UNIT_IN_DEFENCE == false: #and UNIT_CANT_MOVE == false:
 		if event.is_action_pressed("ui_down"):
 			move(Vector2.DOWN)
 		elif event.is_action_pressed("ui_up"):
@@ -184,45 +186,73 @@ func can_i_hire_this_unit(COST : Dictionary):
 
 # добавить в парамерты тип местности и бонусы от флангов
 func FIGHT(attack_node, defence_node):
-	var ratio :float
-	var ratio_2 :float = 0
+	var ratio :float = 0 #сотношение сил
+	var ratio_2 :float = 0 #прогрессия эффекта урона от увеличения соотношения сил 
 	var base_damage = 30
 	var damage
+	var attacker_is_stronger = true
 	var def_health = (100 - defence_node.stats["heath"]) * 0.5
 	var att_health = (100 - attack_node.stats["heath"]) * 0.5
-	var defence_bonus
-	var bonus_first = 0.20
-	var dam_for_att
+	var defence_bonus = 0.0
+	var bonus_vs_enemy_att = 0.0
+	var bonus_vs_enemy_def = 0.0
+	var bonus_first = 0.20 #бонус за инициативу в нападении
+	var dam_for_att = 0.0 #коэффициент урона для атакующего
 	
 	if defence_node.stats["status"] == "defence":
-		defence_bonus = 0.25
-	else:
-		defence_bonus = 0
+		defence_bonus = 0.4
 	
+	if attack_node.stats["type"] == "spire" and defence_node.stats["type"] == "knight":
+		bonus_vs_enemy_att = 1.0
+	elif attack_node.stats["type"] == "knight" and defence_node.stats["type"] == "spire":
+		bonus_vs_enemy_def = 1.0
+	elif attack_node.stats["type"] == "knight" and defence_node.stats["type"] == "archer":
+		bonus_vs_enemy_att = 1.0
+	elif attack_node.stats["type"] == "archer" and defence_node.stats["type"] == "knight":
+		bonus_vs_enemy_att = 0.5
+	elif attack_node.stats["type"] == "archer" and defence_node.stats["type"] == "spire":
+		bonus_vs_enemy_att = 0.5
+	elif attack_node.stats["type"] == "spire" and defence_node.stats["type"] == "archer":
+		bonus_vs_enemy_att = 0.5
 
-	
-	ratio = (attack_node.stats["power"] * (1 + bonus_first)) / (defence_node.stats["power"] * (1 + defence_bonus))
+	# начинаем проверку соотношения сил; может оказаться, что нападающий - слабее, тогда меняем соотношение в обр.сторону
+	ratio = (attack_node.stats["power"] * (1 + bonus_first + bonus_vs_enemy_att)) / (defence_node.stats["power"] * (1 + defence_bonus + bonus_vs_enemy_def))
 	print("RATIO:  ", ratio)
 	if ratio > 1:
+		attacker_is_stronger = true
 		ratio_2 = abs(1.0 - ratio)
-	# коэффициент урона, чем слабее другой юнит, тем меньше урона наносишь себе
+	else: 
+		attacker_is_stronger = false
+		ratio = (defence_node.stats["power"] * (1 + defence_bonus + bonus_vs_enemy_def)) / (attack_node.stats["power"] * (1 + bonus_first + bonus_vs_enemy_att))
+		ratio_2 = abs(1.0 - ratio)
+	print("RATIO:  ", ratio)
+	print("ratio_2:  ", ratio_2)
+	
+	# коэффициент урона для атакующего, чем слабее другой юнит, тем меньше урона наносишь себе
 	if int(ratio*10) in range(10, 12):
 		dam_for_att = 0.6
 	elif int(ratio*10) in range(12, 13):
 		dam_for_att = 0.5
-	elif ratio*10 in range(13, 15):
+	elif int(ratio*10) in range(13, 15):
 		dam_for_att = 0.3
-	elif ratio*10 in range(15, 16):
+	elif int(ratio*10) in range(15, 16):
 		dam_for_att = 0.2
-	elif ratio*10 in range(16, 19):
+	elif int(ratio*10) in range(16, 19):
 		dam_for_att = 0.15
 	
-	print("ratio_2:  ", ratio_2)
 	# базовый + отношение сил - неполное_здоровье_нападающего + неполное здоровье обороняющегося (чем он слабее тем сильнее урон)
 	damage = (base_damage + (base_damage * ratio_2) - att_health + def_health)
-	
-	defence_node.stats["heath"] -= damage
 	var dam_for_att_full :int = int(damage * dam_for_att)
-	attack_node.stats["heath"] -= dam_for_att_full
 	print("DAMAGE:  ", damage)
-	self.UNIT_STRIKES.emit(SELECTED_NODE, COLLIDING_NODE, damage, dam_for_att_full) # посылаем сигнал в ноду атакуемого юнита
+	print("dam_for_att_full ", dam_for_att_full)
+	print("attacker_is_stronger: ", attacker_is_stronger)
+	
+	#меняем статы и отправляем сигналы в лейблы
+	if attacker_is_stronger == true:
+		defence_node.stats["heath"] -= damage
+		attack_node.stats["heath"] -= dam_for_att_full
+	elif attacker_is_stronger == false:
+		defence_node.stats["heath"] -= dam_for_att_full
+		attack_node.stats["heath"] -= damage
+
+	self.UNIT_STRIKES.emit(SELECTED_NODE, COLLIDING_NODE, damage, dam_for_att_full, attacker_is_stronger) # посылаем сигнал в ноду атакуемого юнита

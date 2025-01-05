@@ -3064,7 +3064,7 @@ tile_set = SubResource("TileSet_3b87a")
 [node name="Units" type="Node" parent="Player_1"]
 
 [node name="Lord" parent="Player_1/Units" groups=["Player_1"] instance=ExtResource("5_rhasn")]
-position = Vector2(248, 184)
+position = Vector2(280, 184)
 
 [node name="Buildings" type="Node" parent="Player_1"]
 
@@ -3075,7 +3075,7 @@ position = Vector2(248, 184)
 [node name="Units" type="Node" parent="Player_2"]
 
 [node name="Lord" parent="Player_2/Units" groups=["Player_2"] instance=ExtResource("5_rhasn")]
-position = Vector2(328, 184)
+position = Vector2(296, 184)
 
 [node name="Buildings" type="Node" parent="Player_2"]
 
