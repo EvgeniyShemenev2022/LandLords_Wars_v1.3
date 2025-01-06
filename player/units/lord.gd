@@ -104,7 +104,16 @@ func _input(event: InputEvent) -> void:
 	if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == false:
 		if mouse_on_unit == true and TURN_MANAGER.ARCHER_IS_SELECTED == true and event.is_action_released("left_click"):
 			print("МОЖНО КЛИКАТЬ И СТРЕлЯТЬ")
-
+			var pos_archer = tile_map_layer.local_to_map(TURN_MANAGER.SELECTED_NODE.global_position)
+			var self_defence = tile_map_layer.local_to_map(self.global_position)
+			var distance = abs(pos_archer - self_defence)
+			#print("pos_archer: ", pos_archer)
+			#print("self_defence: ", self_defence)
+			if distance.x > 2 or distance.y > 2:
+				print("TO FARE!!!")
+			else:
+				print("ВЫСТРЕЛ!")
+				TURN_MANAGER.FIGHT(TURN_MANAGER.SELECTED_NODE, self as Node2D)
 
 # ПО СИГНАЛУ выключаем анимацию и ставим блок на выбор
 func is_unit_finished_his_turn(SELECTED_NODE):

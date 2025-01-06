@@ -186,6 +186,8 @@ func can_i_hire_this_unit(COST : Dictionary):
 
 # добавить в парамерты тип местности и бонусы от флангов
 func FIGHT(attack_node, defence_node):
+	print(attack_node.name)
+	print(defence_node.name)
 	var ratio :float = 0 #сотношение сил
 	var ratio_2 :float = 0 #прогрессия эффекта урона от увеличения соотношения сил 
 	var base_damage = 30
@@ -213,7 +215,7 @@ func FIGHT(attack_node, defence_node):
 	elif attack_node.stats["type"] == "archer" and defence_node.stats["type"] == "spire":
 		bonus_vs_enemy_att = 0.5
 	elif attack_node.stats["type"] == "spire" and defence_node.stats["type"] == "archer":
-		bonus_vs_enemy_att = 0.5
+		bonus_vs_enemy_att = 1.0
 
 	# начинаем проверку соотношения сил; может оказаться, что нападающий - слабее, тогда меняем соотношение в обр.сторону
 	ratio = (attack_node.stats["power"] * (1 + bonus_first + bonus_vs_enemy_att)) / (defence_node.stats["power"] * (1 + defence_bonus + bonus_vs_enemy_def))
@@ -248,11 +250,16 @@ func FIGHT(attack_node, defence_node):
 	print("attacker_is_stronger: ", attacker_is_stronger)
 	
 	#меняем статы и отправляем сигналы в лейблы
-	if attacker_is_stronger == true:
+	if attack_node.stats["type"] == "archer":
 		defence_node.stats["heath"] -= damage
-		attack_node.stats["heath"] -= dam_for_att_full
-	elif attacker_is_stronger == false:
-		defence_node.stats["heath"] -= dam_for_att_full
-		attack_node.stats["heath"] -= damage
+		dam_for_att_full = 0
+	else:
+		if attacker_is_stronger == true:
+			defence_node.stats["heath"] -= damage
+			attack_node.stats["heath"] -= dam_for_att_full
+		elif attacker_is_stronger == false:
+			defence_node.stats["heath"] -= dam_for_att_full
+			attack_node.stats["heath"] -= damage
 
-	self.UNIT_STRIKES.emit(SELECTED_NODE, COLLIDING_NODE, damage, dam_for_att_full, attacker_is_stronger) # посылаем сигнал в ноду атакуемого юнита
+	# изначально передавал COLLIDING_NODE и при атаке лучника ничего не передавалось
+	self.UNIT_STRIKES.emit(SELECTED_NODE, defence_node, damage, dam_for_att_full, attacker_is_stronger) # посылаем сигнал в ноду атакуемого юнита
