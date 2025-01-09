@@ -52,14 +52,27 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			move(Vector2.RIGHT)
 		
 		# у юнита (заканчиваются ходы), удаляем ноду из массива, сигнал на снятие анимации и запрет на выбор
-		if default_move <= 0:
+		if SELECTED_NODE.stats["base_turn"] <= 0:
 			var unit_index = find_index_of_selected_unit_by_name(SELECTED_NODE)
 			#print(unit_index)
 			delete_unit_from_array(unit_index)
 			print(units_col)
-			self.SELECTED_NODE_END_TURN.emit(SELECTED_NODE)
 			
-			default_move = 2
+			#WARNING переделать в функцию, после неполного хода юнитом его ходы нужно принудительно обнулить
+			# после завершения всех ходов 
+			var a = SELECTED_NODE.stats
+			if a["type"] == "spire":
+				SELECTED_NODE.stats["base_turn"] = 2
+			elif a["type"] == "archer":
+				SELECTED_NODE.stats["base_turn"] = 2
+			elif a["type"] == "lord":
+				SELECTED_NODE.stats["base_turn"] = 2
+				print("попал в МЭТЧ")
+			elif a["type"] == "knight":
+				SELECTED_NODE.stats["base_turn"] = 4
+			#default_move = 2
+			
+			self.SELECTED_NODE_END_TURN.emit(SELECTED_NODE)
 			
 			if units_col.size() == 0:
 				change_turn()
@@ -93,7 +106,7 @@ func move(direction: Vector2):
 	SELECTED_UNIT_POSITION = SELECTED_NODE.global_position
 	#icon.global_position = tile_map_layer.map_to_local(current_tile)
 	current_turn_is_ok()
-	print(default_move, " - ", current_move)
+	print(SELECTED_NODE.stats["base_turn"], " - ", current_move)
 	
 func what_type_of_unit(type: String):
 	if type == "spire": 		return COST_SPIRE
@@ -178,7 +191,8 @@ func hire_unit(name, type, base_turn, power, heath, defence):
 
 # вызывается в move(), только если юнит реально потратил ход
 func current_turn_is_ok():
-	default_move -= current_move
+	if SELECTED_NODE.stats["base_turn"] > 0:
+		SELECTED_NODE.stats["base_turn"] -= current_move
 
 func can_i_hire_this_unit(COST : Dictionary):
 	if COST["gold"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["gold"] or COST["production"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["production"] or COST["food"] > GLOBAL.WHOSE_RESOURSE_TO_TAKE()["food"]:
@@ -265,3 +279,8 @@ func FIGHT(attack_node, defence_node):
 	# изначально передавал COLLIDING_NODE и при атаке лучника ничего не передавалось
 	self.UNIT_STRIKES.emit(SELECTED_NODE, defence_node, damage, dam_for_att_full, attacker_is_stronger) # посылаем сигнал в ноду атакуемого юнита
 	
+	# после атаки юнит теряет все ходы
+	var unit_index = find_index_of_selected_unit_by_name(SELECTED_NODE)
+	delete_unit_from_array(unit_index)
+	print(units_col)
+	self.SELECTED_NODE_END_TURN.emit(SELECTED_NODE)
