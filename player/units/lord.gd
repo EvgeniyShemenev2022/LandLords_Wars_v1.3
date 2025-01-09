@@ -102,7 +102,7 @@ func _input(event: InputEvent) -> void:
 			TURN_MANAGER.IS_UNIT_IN_DEFENCE = is_in_defence # если юнит в обороне, он не должен ходить
 	# условие для лучника
 	if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == false:
-		if mouse_on_unit == true and TURN_MANAGER.ARCHER_IS_SELECTED == true and event.is_action_released("left_click"):
+		if mouse_on_unit == true and TURN_MANAGER.ARCHER_IS_SELECTED == true and event.is_action_released("right_click"):
 			print("МОЖНО КЛИКАТЬ И СТРЕлЯТЬ")
 			var pos_archer = tile_map_layer.local_to_map(TURN_MANAGER.SELECTED_NODE.global_position)
 			var self_defence = tile_map_layer.local_to_map(self.global_position)
@@ -159,6 +159,7 @@ func unit_was_attacked(attack_node, defence_node, damage, dam_for_att_full, atta
 
 func _on_archer_shot_area_mouse_entered() -> void:
 	prints("Юнит: ", self,  self.get_groups() )
+	print(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW])
 	if TURN_MANAGER.ARCHER_IS_SELECTED == true:
 		print("ARCHER_IS_SELECTED == true")
 		if self.is_in_group(TURN_MANAGER.CURRENT_PLYER[TURN_MANAGER.WHO_ARE_TURNED_NOW]) == false:

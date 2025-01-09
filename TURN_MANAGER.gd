@@ -211,9 +211,9 @@ func FIGHT(attack_node, defence_node):
 	elif attack_node.stats["type"] == "knight" and defence_node.stats["type"] == "archer":
 		bonus_vs_enemy_att = 1.0
 	elif attack_node.stats["type"] == "archer" and defence_node.stats["type"] == "knight":
-		bonus_vs_enemy_att = 0.5
+		bonus_vs_enemy_att = 0.9
 	elif attack_node.stats["type"] == "archer" and defence_node.stats["type"] == "spire":
-		bonus_vs_enemy_att = 0.5
+		bonus_vs_enemy_att = 0.9
 	elif attack_node.stats["type"] == "spire" and defence_node.stats["type"] == "archer":
 		bonus_vs_enemy_att = 1.0
 
@@ -253,6 +253,7 @@ func FIGHT(attack_node, defence_node):
 	if attack_node.stats["type"] == "archer":
 		defence_node.stats["heath"] -= damage
 		dam_for_att_full = 0
+		attacker_is_stronger = true
 	else:
 		if attacker_is_stronger == true:
 			defence_node.stats["heath"] -= damage
@@ -263,3 +264,4 @@ func FIGHT(attack_node, defence_node):
 
 	# изначально передавал COLLIDING_NODE и при атаке лучника ничего не передавалось
 	self.UNIT_STRIKES.emit(SELECTED_NODE, defence_node, damage, dam_for_att_full, attacker_is_stronger) # посылаем сигнал в ноду атакуемого юнита
+	
