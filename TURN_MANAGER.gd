@@ -58,19 +58,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			delete_unit_from_array(unit_index)
 			print(units_col)
 			
-			#WARNING переделать в функцию, после неполного хода юнитом его ходы нужно принудительно обнулить
-			# после завершения всех ходов 
-			var a = SELECTED_NODE.stats
-			if a["type"] == "spire":
-				SELECTED_NODE.stats["base_turn"] = 2
-			elif a["type"] == "archer":
-				SELECTED_NODE.stats["base_turn"] = 2
-			elif a["type"] == "lord":
-				SELECTED_NODE.stats["base_turn"] = 2
-				print("попал в МЭТЧ")
-			elif a["type"] == "knight":
-				SELECTED_NODE.stats["base_turn"] = 4
-			#default_move = 2
+			#обновляем значения хода в словаре юнита
+			#update_units_turns()
 			
 			self.SELECTED_NODE_END_TURN.emit(SELECTED_NODE)
 			
@@ -123,6 +112,11 @@ func recount_units_in_arr():
 func get_all_units_by_player():
 	units_col.append_array(get_tree().get_nodes_in_group(CURRENT_PLYER[WHO_ARE_TURNED_NOW]))
 	print("func get_all_units_by_player    ", get_tree().get_nodes_in_group(CURRENT_PLYER[WHO_ARE_TURNED_NOW]))
+	#в начале каждого хода обновляем значения ходов для всех юнитов игрока
+	if units_col.size() >= 1 and CURRENT_TURN > 1:
+		for unit in units_col:
+			update_units_turns(unit)
+
 
 # определяем чей сейчас ход (нажатие на кнопку)
 func start_turn():
@@ -158,6 +152,17 @@ func change_turn():
 	MANAGER.IS_PRODUCTION_JUST_BUILT = false
 	GLOBAL.CAPITAL_PRODUCT_EVERY_TURN()
 	self.CHANGE_TURN.emit()
+
+# после окончания хода обновляем данные в словаре юнита; так же и при не полном ходе;
+func update_units_turns(unit :Node2D):
+		if unit.stats["type"] == "spire":
+			unit.stats["base_turn"] = 2
+		elif unit.stats["type"] == "archer":
+			unit.stats["base_turn"] = 2
+		elif unit.stats["type"] == "lord":
+			unit.stats["base_turn"] = 2
+		elif unit.stats["type"] == "knight":
+			unit.stats["base_turn"] = 4
 
 # создаем юнита
 func hire_unit(name, type, base_turn, power, heath, defence):
