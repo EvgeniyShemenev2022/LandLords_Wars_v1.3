@@ -111,9 +111,11 @@ func _input(event: InputEvent) -> void:
 			#print("self_defence: ", self_defence)
 			if distance.x > 2 or distance.y > 2:
 				print("TO FARE!!!")
+				INFO_MANAGER.WHAT_HAPPENED = "TO FARE!!!"
 			else:
 				print("ВЫСТРЕЛ!")
 				TURN_MANAGER.FIGHT(TURN_MANAGER.SELECTED_NODE, self as Node2D)
+				INFO_MANAGER.WHAT_HAPPENED = self.name + " атакован лучником"
 
 # ПО СИГНАЛУ выключаем анимацию и ставим блок на выбор
 func is_unit_finished_his_turn(SELECTED_NODE):

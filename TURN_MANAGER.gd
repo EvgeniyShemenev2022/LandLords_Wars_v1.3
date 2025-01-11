@@ -14,7 +14,6 @@ var UNIT_TYPE :int = 3 # соответствует номеру в массив
 var numb_of_unit :int = 1
 @onready var warrior = preload("res://player/units/lord.tscn")
 var IS_UNIT_IN_DEFENCE = false
-var UNIT_CANT_MOVE = false #костыль, используется когда выбрали юнита, а затем сняли выбор мышкой
 var ARCHER_IS_SELECTED = false
 
 var default_move : int = 2
@@ -41,7 +40,7 @@ func _ready() -> void:
 	pass
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if units_col.has(SELECTED_NODE) == true and IS_UNIT_IN_DEFENCE == false: #and UNIT_CANT_MOVE == false:
+	if units_col.has(SELECTED_NODE) == true and IS_UNIT_IN_DEFENCE == false:
 		if event.is_action_pressed("ui_down"):
 			move(Vector2.DOWN)
 		elif event.is_action_pressed("ui_up"):
@@ -73,6 +72,7 @@ func move(direction: Vector2):
 		current_tile.y + direction.y
 	)
 	prints("текущий тайл:  ", current_tile, ";    цель:  ", target_tile)
+	INFO_MANAGER.WHAT_HAPPENED = "текущий тайл: " + str(current_tile)
 	
 	var tile_data: TileData = tile_map_layer.get_cell_tile_data(target_tile)
 	
@@ -87,6 +87,7 @@ func move(direction: Vector2):
 			return
 		else:
 			print("ATTACK!   ",COLLIDING_NODE)
+			INFO_MANAGER.WHAT_HAPPENED = "ATTACK! " + str(COLLIDING_NODE.name)
 			FIGHT(SELECTED_NODE, COLLIDING_NODE)
 			
 			return
