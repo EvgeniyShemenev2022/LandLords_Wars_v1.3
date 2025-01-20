@@ -86,14 +86,17 @@ func _input(event: InputEvent) -> void:
 		MANAGER.buld_a_production()
 	#состояние юнита при обороне (клавиша D)
 	if event.is_action_pressed("defence") and is_selected == true:
+		if self.stats["type"] == "knight":
+			INFO_MANAGER.WHAT_HAPPENED = "Рыцари не могут укрепляться и получать бонус от обороны"
+			return
 		if is_in_defence == false:
 			self.stats["status"] = "defence"
-			self.stats["defence"] = stats.defence * 1.25
+			self.stats["defence"] = stats.defence * 1.25 # решил отказаться от этого параметра
 			d_label.visible = true
 			animation_player.stop()
 			is_in_defence = true
 			TURN_MANAGER.IS_UNIT_IN_DEFENCE = is_in_defence # если юнит в обороне, он не должен ходить
-		else:
+		elif is_in_defence == true:
 			self.stats["status"] = "on_moving"
 			self.stats["defence"] = stats.defence * 0.8
 			d_label.visible = false

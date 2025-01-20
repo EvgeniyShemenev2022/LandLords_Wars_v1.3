@@ -286,7 +286,10 @@ func FIGHT(attack_node, defence_node):
 	self.UNIT_STRIKES.emit(SELECTED_NODE, defence_node, damage, dam_for_att_full, attacker_is_stronger) # посылаем сигнал в ноду атакуемого юнита
 	
 	# после атаки юнит теряет все ходы
-	var unit_index = find_index_of_selected_unit_by_name(SELECTED_NODE)
-	delete_unit_from_array(unit_index)
-	print(units_col)
-	self.SELECTED_NODE_END_TURN.emit(SELECTED_NODE)
+	if SELECTED_NODE.stats["type"] == "knight":
+		current_turn_is_ok()
+	elif SELECTED_NODE.stats["type"] != "knight":
+		var unit_index = find_index_of_selected_unit_by_name(SELECTED_NODE)
+		delete_unit_from_array(unit_index)
+		print(units_col)
+		self.SELECTED_NODE_END_TURN.emit(SELECTED_NODE)
